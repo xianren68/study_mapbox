@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    <!-- 导入l7 -->
+    <script src = 'https://unpkg.com/@antv/l7'></script>
+</head>
+    <style>
+        html,body{
+            overflow: hidden;
+            margin:0;
+        }
+        #container{
+            position:absolute;
+            top:0;
+            left:0;
+            bottom:0;
+            right:0;
+            margin:auto;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+<body>
+    <div id="container"></div>
+    <script>
+        // 高德底图
+        const gaode =  {
+                "version": 8,
+                        "sources": {
+                              "raster-tiles": {
+                                    "type": "raster",
+                                    "tiles": ["http://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}"],
+                                    "tileSize": 256
+                              }
+                        },
+                        "layers": [{
+                              "id": "simple-tiles",
+                              "type": "raster",
+                              "source": "raster-tiles",
+                              "minzoom": 0,
+                              "maxzoom": 22
+                        }]
+            }
+        const token = 'pk.eyJ1IjoiY2hlbmdiZW5jaGFvIiwiYSI6ImNsODU3aGRiODA0Y2UzcHBzZmFlcmdqZ2sifQ.8k59W_pB_Riwe6o-MneRlA'
+        const scene = new L7.Scene({
+            // 容器区域
+            id:'container',
+            map:new L7.Mapbox({
+                // 图层
+                style:gaode,
+                center: [114.050008, 22.529272],
+                zoom:7,
+                projection:'globe',
+                token,
+            })
+        })
+        // 设置样式及事件
+        const {map} = scene
+        map.on('style.load',()=>{
+            map.setFog({})
+        })
+        // 加载深圳市数据
+        scene.on('loaded', async ()=>{
+            // 获取数据
+            const res = await fetch('https://gw.alipayobjects.com/os/basement_prod/972566c5-a2b9-4a7e-8da1-bae9d0eb0117.json')
+            // json格式
+            const data = await res.json()
+            // 新建数据图层
+            const layer = new L7.PolygonLayer({})
+            // 数据资源
+            .source(data)
+            // 数据形状(是否有高度)
+            .shape('extrude')
+            // 数据高度
+            .size('h20')
+            // 是否有选中样式
+            .active(true)
+            // 将图层添加到scene
+            scene.addLayer(layer)
+        })
+
+    </script>
+</body>
+</html>
