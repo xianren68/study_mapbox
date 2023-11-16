@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 导入mapbox依赖 -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+<style>
+    #container {
+        height: 100vh;
+        width: 100vw;
+    }
+</style>
+
+<body>
+    <!-- 设置容器 -->
+    <div id="container">
+    </div>
+    <script>
+        // mapboxtoken
+        mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlbmdiZW5jaGFvIiwiYSI6ImNsODU3aGRiODA0Y2UzcHBzZmFlcmdqZ2sifQ.8k59W_pB_Riwe6o-MneRlA'
+        // 创建mapbox地图
+        const map = new mapboxgl.Map({
+            // 容器
+            container: 'container',
+            // 底图(高德)
+            style: {
+                "version": 8,
+                        "sources": {
+                              "raster-tiles": {
+                                    "type": "raster",
+                                    "tiles": ["http://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}"],
+                                    "tileSize": 256
+                              }
+                        },
+                        "layers": [{
+                              "id": "simple-tiles",
+                              "type": "raster",
+                              "source": "raster-tiles",
+                              "minzoom": 0,
+                              "maxzoom": 22
+                        }]
+            },
+            // 开始视角
+            center: [-74.5, 40], // starting position [lng, lat]
+            // 缩放比例
+            zoom: 4, // starting zoom
+            // 放大后的样式（球体/平面)
+            projection:'globe'
+        })
+        // 设置一些样式，在地图加载后
+        map.on('style.load',()=>{
+            map.setFog({
+                // 大气层颜色
+                'color':"#008c8c",
+                // 高空颜色
+                'high-color':'#ccc',
+                // 星空背景
+                'space-color':'#fff'
+                
+            })
+        })
+    </script>
+</body>
+
+</html>
