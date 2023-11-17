@@ -32,11 +32,11 @@
         }
     </style>
 <body>
-    <div id="btn">复位</div>
+    <div id="btn">街景图</div>
     <div id="container"></div>
     <script>
         // 高德图层
-         const gaode =  {
+        const gaode =  {
                 "version": 8,
                         "sources": {
                               "raster-tiles": {
@@ -57,7 +57,7 @@
         mapboxgl.accessToken = token
         const map = new mapboxgl.Map({
             container:'container',
-            style:gaode,
+            style:'mapbox://styles/mapbox/streets-v11',
             zoom:1.5,
             center:[114.30, 30.50],
             projection:'globe',
@@ -65,28 +65,17 @@
         map.on('style.load',()=>{
             map.setFog({})
         })
-        // 点击漫游
-        map.on('click',()=>{
-            map.flyTo({
-                zoom:13,
-                center:[114.30, 30.50],
-                // 飞行速度
-                speed:0.2,
-                pitch:80,
-                // 启用过程过渡
-                essential:true
-            })
-        })
-        // 添加复位事件
-        document.getElementById('btn').addEventListener('click',()=>{
-            map.flyTo({
-                zoom:1.5,
-                center:[114.30, 30.50],
-                // 飞行速度
-                speed:0.2,
-                essential:true,
-                pitch:0
-            })
+
+
+        // 切换图层
+        document.getElementById('btn').addEventListener('click',(e)=>{
+            if(e.target.innerText == '街景图'){
+                e.target.innerText = '卫星图'
+                map.setStyle('mapbox://styles/mapbox/satellite-v9')
+            }else {
+                e.target.innerText = '街景图'
+                map.setStyle('mapbox://styles/mapbox/streets-v11')
+            }
         })
     </script>
 </body>

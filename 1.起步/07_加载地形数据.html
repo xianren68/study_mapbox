@@ -20,19 +20,9 @@
             height: 100%;
             width: 100%;
         }
-        #btn{
-            z-index: 2;
-            color: #fff;
-            font-size: 10px;
-            text-align: center;
-            position: fixed;
-            height: 20px;
-            width: 40px;
-            background-color: #ccc;
-        }
+
     </style>
 <body>
-    <div id="btn">复位</div>
     <div id="container"></div>
     <script>
         // 高德图层
@@ -57,36 +47,20 @@
         mapboxgl.accessToken = token
         const map = new mapboxgl.Map({
             container:'container',
-            style:gaode,
+            style:'mapbox://styles/mapbox/satellite-v9',
             zoom:1.5,
             center:[114.30, 30.50],
             projection:'globe',
         })
         map.on('style.load',()=>{
             map.setFog({})
-        })
-        // 点击漫游
-        map.on('click',()=>{
-            map.flyTo({
-                zoom:13,
-                center:[114.30, 30.50],
-                // 飞行速度
-                speed:0.2,
-                pitch:80,
-                // 启用过程过渡
-                essential:true
+            // 添加dem地形高度数据
+            map.addSource('mapbox-dem',{
+                'type': 'raster-dem',
+                url: 'mapbox://mapbox.mapbox-terrain-dem-v1'
             })
-        })
-        // 添加复位事件
-        document.getElementById('btn').addEventListener('click',()=>{
-            map.flyTo({
-                zoom:1.5,
-                center:[114.30, 30.50],
-                // 飞行速度
-                speed:0.2,
-                essential:true,
-                pitch:0
-            })
+            // 设置地形数据
+            map.setTerrain({source:'mapbox-dem',exaggeration: 1.5})
         })
     </script>
 </body>

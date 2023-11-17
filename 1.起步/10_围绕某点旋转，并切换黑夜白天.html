@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+    需求
+    1. 点击地球自转，再点击，地球停止旋转
+    2. 再缩放小于4的时候不旋转
+ -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+<style>
+    html,
+    body {
+        overflow: hidden;
+        margin: 0;
+    }
+
+    #container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        width: 100%;
+    }
+</style>
+
+<body>
+    <div id="container"></div>
+    <script>
+        // 高德图层
+        const gaode = {
+            "version": 8,
+            "sources": {
+                "raster-tiles": {
+                    "type": "raster",
+                    "tiles": ["http://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}"],
+                    "tileSize": 256
+                }
+            },
+            "layers": [{
+                "id": "simple-tiles",
+                "type": "raster",
+                "source": "raster-tiles",
+                "minzoom": 0,
+                "maxzoom": 22
+            }]
+        }
+        const token = 'pk.eyJ1IjoiY2hlbmdiZW5jaGFvIiwiYSI6ImNsODU3aGRiODA0Y2UzcHBzZmFlcmdqZ2sifQ.8k59W_pB_Riwe6o-MneRlA'
+        mapboxgl.accessToken = token
+        const map = new mapboxgl.Map({
+            container: 'container',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            zoom: 13,
+            center: [114.30, 30.50],
+            projection: 'globe',
+            pitch:90,
+        })
+        map.on('style.load', () => {
+            map.setFog({})
+            // 地形数据
+            map.addSource('mapbox-dem',{
+                'type': 'raster-dem',
+                url: 'mapbox://mapbox.mapbox-terrain-dem-v1'
+            })
+            // 设置地形数据
+            map.setTerrain({source:'mapbox-dem',exaggeration: 1.5})
+            setTimeout(() => {
+                rotateMap()
+            },3000);
+        })
+        map.on('moveend',()=>{
+            rotateMap()
+        })
+        // 围绕一点旋转，改变水平角即可
+        function rotateMap(){
+            // 获取水平角
+            const bear = map.getBearing()
+            
+            map.easeTo({bearing:bear+10,duration:500,easing:x=>x,essential:true})
+            if(bear > 0){
+                // 白天
+                map.setFog({
+                    range: [-1, 2],
+                    "horizon-blend": 0.3,
+                    color: "#242B4B",
+                    "high-color": "#161B36",
+                    "space-color": "#0B1026",
+                    "star-intensity": 0.8,
+                })
+            }else {
+                // 黑夜
+                map.setFog({
+                    range: [-1, 2],
+                    "horizon-blend": 0.3,
+                    color: "white",
+                    "high-color": "#add8e6",
+                    "space-color": "#d8f2ff",
+                    "star-intensity": 0.0,
+                })
+            }
+        }
+    </script>
+</body>
+
+</html>
